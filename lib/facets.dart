@@ -91,7 +91,7 @@ Future<ProcessedFacets> processFacets(
             utf8.decode(
               facetBytes.sublist(
                 lastPos,
-                facet.index.byteStart,
+                facet.index.byteStart <= facetBytes.length ? facet.index.byteStart : facetBytes.length, 
               ),
             ),
           ),
@@ -104,7 +104,7 @@ Future<ProcessedFacets> processFacets(
       final facetText = utf8.decode(
         facetBytes.sublist(
           facet.index.byteStart,
-          facet.index.byteEnd,
+          facet.index.byteEnd <= facetBytes.length ? facet.index.byteEnd : facetBytes.length,
         ),
       );
 
@@ -139,7 +139,15 @@ Future<ProcessedFacets> processFacets(
   }
 
   // Add the text after the last facet.
-  output.add(escape.convert(utf8.decode(facetBytes.sublist(lastPos))));
+  output.add(
+    escape.convert(
+      utf8.decode(
+        facetBytes.sublist(
+          lastPos <= facetBytes.length ? lastPos : facetBytes.length,
+        )
+      )
+    )
+  );
 
   // Map mention facets to MastodonMention objects.
   final mentionUsers = await Future.wait(
